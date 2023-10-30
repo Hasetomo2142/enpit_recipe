@@ -3,65 +3,73 @@ import networkx as nx
 import pickle
 from tqdm import tqdm
 from cookpad.recipe_loader import RecipeLoader
-import sys
 import os
-
 
 class CreateGraph:
     def __init__(self):
+        # グラフの初期化
         self.G = nx.Graph()
+        # 読み込んだレシピのリスト
         self.loaded_recipes = []
+        # グラフのエッジの重みを保持する辞書
         self.edge_weights = {}
+        # PyVisのネットワークの初期化
         self.nt = Network(notebook=True)
+        # 読み込むレシピの数
         self.number_of_recipes = 0
 
     def isRecipeCashAvailable(self, num):
-        file_path = os.path.join(
-            "app/cash/recipes", "recipes.pickle_" + str(num))
-
-        if os.path.exists(file_path) and os.path.isfile(file_path):
-            return True
-        else:
-            return False
+        # 指定した数のレシピに関連するキャッシュファイルの存在を確認
+        file_path = os.path.join("cash", "recipes", f"recipes.pickle_{num}")
+        return os.path.exists(file_path)
 
     def isGraphCashAvailable(self, num):
-        file_path = os.path.join(
-            "app/cash/graphs", "graphs.pickle_" + str(num))
+        # 指定した数のレシピに関連するグラフのキャッシュファイルの存在を確認
+        file_path = os.path.join("cash", "graphs", f"graphs.pickle_{num}")
+        return os.path.exists(file_path)
 
-        if os.path.exists(file_path) and os.path.isfile(file_path):
-            return True
-        else:
-            return False
+    def ensure_directory_exists(self, dir_path):
+        # 指定したディレクトリが存在しない場合、ディレクトリを作成
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
 
     def load_recipes_from_cookpad(self):
-        # 学習するレシピの数を指定し、自身に格納
+        # コマンドラインから読み込むレシピの数を取得
         self.number_of_recipes = self.get_integer_from_command_line()
 
-        # キャッシュが存在しなければ新規作成
+        # レシピのキャッシュディレクトリのパスを作成し、存在しない場合はディレクトリを作成
+        recipe_dir = os.path.join("cash", "recipes")
+        self.ensure_directory_exists(recipe_dir)
+
+        # レシピのキャッシュファイルのパスを作成
+        recipe_file_path = os.path.join(recipe_dir, f"recipes.pickle_{self.number_of_recipes}")
+
+        # キャッシュが存在しない場合、レシピを読み込みとキャッシュの保存を行う
         if not self.isRecipeCashAvailable(self.number_of_recipes):
-            # レシピの読み込み
             with RecipeLoader() as rl:
                 recipes_gen = rl.load_all_recipes()
-                self.loaded_recipes = [next(recipes_gen)
-                                    for _ in range(self.number_of_recipes)]
+                self.loaded_recipes = [next(recipes_gen) for _ in range(self.number_of_recipes)]
 
-            with open("app/cash/recipes/recipes.pickle_" + str(self.number_of_recipes), mode="wb") as f:
+            with open(recipe_file_path, mode="wb") as f:
                 pickle.dump(self.loaded_recipes, f)
-
-        # キャッシュが存在すればキャッシュから読み込み
+        # キャッシュが存在する場合、キャッシュからレシピを読み込む
         else:
-            with open("app/cash/recipes/recipes.pickle_" + str(self.number_of_recipes), mode="rb") as f:
+            with open(recipe_file_path, mode="rb") as f:
                 self.loaded_recipes = pickle.load(f)
 
-
     def build_graph(self):
-        # キャッシュが存在しなければ新規作成
+        # グラフのキャッシュディレクトリのパスを作成し、存在しない場合はディレクトリを作成
+        graph_dir = os.path.join("cash", "graphs")
+        self.ensure_directory_exists(graph_dir)
+
+        # グラフのキャッシュファイルのパスを作成
+        graph_file_path = os.path.join(graph_dir, f"graphs.pickle_{self.number_of_recipes}")
+
+        # キャッシュが存在しない場合、レシピからグラフを構築し、キャッシュとして保存
         if not self.isGraphCashAvailable(self.number_of_recipes):
-            # レシピがまだ読み込まれていない場合、読み込む
             if not self.loaded_recipes:
                 self.load_recipes_from_cookpad()
 
-            # レシピからグラフを構築
             for recipe in tqdm(self.loaded_recipes, desc="Processing recipes"):
                 ingredients = recipe.get_ingredients()
 
@@ -73,19 +81,15 @@ class CreateGraph:
                         edge_key = tuple(sorted([ingredients[i][0], ingredients[j][0]]))
                         self.edge_weights[edge_key] = self.edge_weights.get(edge_key, 0) + 1
 
-            # エッジの重みをもとにグラフにエッジを追加
             for (src, dst), weight in self.edge_weights.items():
                 self.G.add_edge(src, dst, weight=weight)
 
-            # 新規に作成したグラフをキャッシュとして保存
-            with open("app/cash/graphs/graphs.pickle_" + str(self.number_of_recipes), mode="wb") as f:
+            with open(graph_file_path, mode="wb") as f:
                 pickle.dump((self.G, self.edge_weights), f)
-
-        # キャッシュが存在すればキャッシュから読み込み
+        # キャッシュが存在する場合、キャッシュからグラフを読み込む
         else:
-            with open("app/cash/graphs/graphs.pickle_" + str(self.number_of_recipes), mode="rb") as f:
+            with open(graph_file_path, mode="rb") as f:
                 loaded_data = pickle.load(f)
-                # print("DEBUG: Loaded data:", loaded_data)  # ここで読み込んだデータの内容を表示
 
                 if not isinstance(loaded_data, tuple) or len(loaded_data) != 2:
                     raise ValueError("キャッシュファイルのフォーマットが不正です。")
@@ -93,37 +97,26 @@ class CreateGraph:
                 self.G, self.edge_weights = loaded_data
 
     def convert_to_pyvis(self):
+        # NetworkXのグラフをPyVisのネットワークに変換
         self.nt.from_nx(self.G)
         self.nt.show_buttons(True)
 
         for edge in self.nt.edges:
             src, dst = edge["from"], edge["to"]
             edge_key = tuple(sorted([src, dst]))
-            weight = self.edge_weights[edge_key]
-            # PyVis uses 'value' attribute to determine thickness
+            weight = self.edge_weights.get(edge_key, 0)
             edge["value"] = weight
 
     def show_graph(self):
-        self.nt.show("graph_" + str(self.number_of_recipes) + ".html")
+        # PyVisのネットワークをHTMLファイルとして表示
+        self.nt.show(f"graph_{self.number_of_recipes}.html")
 
     @staticmethod
     def get_integer_from_command_line():
+        # コマンドラインから整数を取得
         while True:
             try:
-                # ユーザーに整数の入力を促す
                 number = int(input("整数を入力してください: "))
-
-                # 入力された整数を返す
                 return number
             except ValueError:
-                # 有効な整数が入力されなかった場合のエラーメッセージ
                 print("有効な整数を入力してください。")
-
-# 使い方
-# graph = CreateGraph()
-# graph.load_recipes_from_cookpad()
-# graph.save_recipes_to_pickle()
-# graph.build_graph()
-# graph.convert_to_pyvis()
-# graph.save_graph_to_pickle()
-# graph.show_graph()
