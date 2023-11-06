@@ -1,0 +1,168 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 600px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+             #config {
+                 float: left;
+                 width: 400px;
+                 height: 600px;
+             }
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+            <div id="config"></div>
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#97c2fc", "id": "ginger", "label": "ginger", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "garlic", "label": "garlic", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "green onion", "label": "green onion", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "pork", "label": "pork", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "sugar", "label": "sugar", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "liquor", "label": "liquor", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "soy sauce", "label": "soy sauce", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "sweet sake", "label": "sweet sake", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "carrot", "label": "carrot", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "green pepper", "label": "green pepper", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "renkon", "label": "renkon", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "who", "label": "who", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "pepper", "label": "pepper", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "salt", "label": "salt", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "onion", "label": "onion", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "milk", "label": "milk", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "fresh cream", "label": "fresh cream", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "grand manier", "label": "grand manier", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "butter", "label": "butter", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "honey", "label": "honey", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "cocoa", "label": "cocoa", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "egg", "label": "egg", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "yogurt", "label": "yogurt", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "lemon", "label": "lemon", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "gelatin", "label": "gelatin", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "fruits", "label": "fruits", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "wormwood", "label": "wormwood", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "new flour", "label": "new flour", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "hot water", "label": "hot water", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "anko", "label": "anko", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "strong flour", "label": "strong flour", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "flour", "label": "flour", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "salad oil", "label": "salad oil", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "dry yeast", "label": "dry yeast", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "glutinous rice", "label": "glutinous rice", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "red bean", "label": "red bean", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "cloth", "label": "cloth", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "sliced cheese", "label": "sliced cheese", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "chicken bouillon", "label": "chicken bouillon", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "white rice", "label": "white rice", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "black tea", "label": "black tea", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "water", "label": "water", "shape": "dot", "size": 10}]);
+                  edges = new vis.DataSet([{"from": "ginger", "to": "garlic", "value": 1, "width": 1}, {"from": "ginger", "to": "green onion", "value": 1, "width": 1}, {"from": "ginger", "to": "pork", "value": 1, "width": 1}, {"from": "ginger", "to": "sugar", "value": 1, "width": 1}, {"from": "ginger", "to": "liquor", "value": 1, "width": 1}, {"from": "ginger", "to": "soy sauce", "value": 1, "width": 1}, {"from": "ginger", "to": "sweet sake", "value": 1, "width": 1}, {"from": "garlic", "to": "green onion", "value": 1, "width": 1}, {"from": "garlic", "to": "pork", "value": 1, "width": 1}, {"from": "garlic", "to": "sugar", "value": 1, "width": 1}, {"from": "garlic", "to": "liquor", "value": 1, "width": 1}, {"from": "garlic", "to": "soy sauce", "value": 1, "width": 1}, {"from": "garlic", "to": "sweet sake", "value": 1, "width": 1}, {"from": "green onion", "to": "pork", "value": 1, "width": 1}, {"from": "green onion", "to": "sugar", "value": 1, "width": 1}, {"from": "green onion", "to": "liquor", "value": 1, "width": 1}, {"from": "green onion", "to": "soy sauce", "value": 1, "width": 1}, {"from": "green onion", "to": "sweet sake", "value": 1, "width": 1}, {"from": "pork", "to": "sugar", "value": 1, "width": 1}, {"from": "pork", "to": "liquor", "value": 1, "width": 1}, {"from": "pork", "to": "soy sauce", "value": 1, "width": 1}, {"from": "pork", "to": "sweet sake", "value": 1, "width": 1}, {"from": "pork", "to": "carrot", "value": 1, "width": 1}, {"from": "pork", "to": "green pepper", "value": 1, "width": 1}, {"from": "pork", "to": "renkon", "value": 1, "width": 1}, {"from": "pork", "to": "who", "value": 1, "width": 1}, {"from": "pork", "to": "pepper", "value": 1, "width": 1}, {"from": "pork", "to": "salt", "value": 1, "width": 1}, {"from": "pork", "to": "onion", "value": 1, "width": 1}, {"from": "sugar", "to": "liquor", "value": 1, "width": 1}, {"from": "sugar", "to": "soy sauce", "value": 1, "width": 1}, {"from": "sugar", "to": "sweet sake", "value": 1, "width": 1}, {"from": "sugar", "to": "milk", "value": 2, "width": 2}, {"from": "sugar", "to": "fresh cream", "value": 2, "width": 2}, {"from": "sugar", "to": "grand manier", "value": 1, "width": 1}, {"from": "sugar", "to": "butter", "value": 1, "width": 1}, {"from": "sugar", "to": "honey", "value": 1, "width": 1}, {"from": "sugar", "to": "cocoa", "value": 1, "width": 1}, {"from": "sugar", "to": "egg", "value": 1, "width": 1}, {"from": "sugar", "to": "yogurt", "value": 1, "width": 1}, {"from": "sugar", "to": "lemon", "value": 1, "width": 1}, {"from": "sugar", "to": "gelatin", "value": 1, "width": 1}, {"from": "sugar", "to": "fruits", "value": 1, "width": 1}, {"from": "liquor", "to": "soy sauce", "value": 1, "width": 1}, {"from": "liquor", "to": "sweet sake", "value": 1, "width": 1}, {"from": "soy sauce", "to": "sweet sake", "value": 1, "width": 1}, {"from": "carrot", "to": "green pepper", "value": 1, "width": 1}, {"from": "carrot", "to": "renkon", "value": 1, "width": 1}, {"from": "carrot", "to": "who", "value": 1, "width": 1}, {"from": "carrot", "to": "pepper", "value": 1, "width": 1}, {"from": "carrot", "to": "salt", "value": 1, "width": 1}, {"from": "carrot", "to": "onion", "value": 1, "width": 1}, {"from": "green pepper", "to": "renkon", "value": 1, "width": 1}, {"from": "green pepper", "to": "who", "value": 1, "width": 1}, {"from": "green pepper", "to": "pepper", "value": 1, "width": 1}, {"from": "green pepper", "to": "salt", "value": 1, "width": 1}, {"from": "green pepper", "to": "onion", "value": 1, "width": 1}, {"from": "renkon", "to": "who", "value": 1, "width": 1}, {"from": "renkon", "to": "pepper", "value": 1, "width": 1}, {"from": "renkon", "to": "salt", "value": 1, "width": 1}, {"from": "renkon", "to": "onion", "value": 1, "width": 1}, {"from": "who", "to": "pepper", "value": 1, "width": 1}, {"from": "who", "to": "salt", "value": 1, "width": 1}, {"from": "who", "to": "onion", "value": 1, "width": 1}, {"from": "pepper", "to": "salt", "value": 1, "width": 1}, {"from": "pepper", "to": "onion", "value": 1, "width": 1}, {"from": "salt", "to": "onion", "value": 1, "width": 1}, {"from": "salt", "to": "wormwood", "value": 1, "width": 1}, {"from": "salt", "to": "new flour", "value": 1, "width": 1}, {"from": "salt", "to": "hot water", "value": 3, "width": 3}, {"from": "salt", "to": "anko", "value": 1, "width": 1}, {"from": "salt", "to": "strong flour", "value": 1, "width": 1}, {"from": "salt", "to": "flour", "value": 1, "width": 1}, {"from": "salt", "to": "egg", "value": 1, "width": 1}, {"from": "salt", "to": "salad oil", "value": 1, "width": 1}, {"from": "salt", "to": "dry yeast", "value": 1, "width": 1}, {"from": "salt", "to": "honey", "value": 1, "width": 1}, {"from": "salt", "to": "glutinous rice", "value": 1, "width": 1}, {"from": "salt", "to": "red bean", "value": 1, "width": 1}, {"from": "salt", "to": "cloth", "value": 1, "width": 1}, {"from": "sliced cheese", "to": "chicken bouillon", "value": 1, "width": 1}, {"from": "sliced cheese", "to": "white rice", "value": 1, "width": 1}, {"from": "chicken bouillon", "to": "white rice", "value": 1, "width": 1}, {"from": "wormwood", "to": "new flour", "value": 1, "width": 1}, {"from": "wormwood", "to": "hot water", "value": 1, "width": 1}, {"from": "wormwood", "to": "anko", "value": 1, "width": 1}, {"from": "new flour", "to": "hot water", "value": 1, "width": 1}, {"from": "new flour", "to": "anko", "value": 1, "width": 1}, {"from": "hot water", "to": "anko", "value": 1, "width": 1}, {"from": "hot water", "to": "milk", "value": 1, "width": 1}, {"from": "hot water", "to": "black tea", "value": 1, "width": 1}, {"from": "hot water", "to": "honey", "value": 2, "width": 2}, {"from": "hot water", "to": "strong flour", "value": 1, "width": 1}, {"from": "hot water", "to": "flour", "value": 1, "width": 1}, {"from": "hot water", "to": "egg", "value": 1, "width": 1}, {"from": "hot water", "to": "salad oil", "value": 1, "width": 1}, {"from": "hot water", "to": "dry yeast", "value": 1, "width": 1}, {"from": "hot water", "to": "glutinous rice", "value": 1, "width": 1}, {"from": "hot water", "to": "red bean", "value": 1, "width": 1}, {"from": "hot water", "to": "cloth", "value": 1, "width": 1}, {"from": "milk", "to": "black tea", "value": 2, "width": 2}, {"from": "milk", "to": "honey", "value": 2, "width": 2}, {"from": "milk", "to": "fresh cream", "value": 3, "width": 3}, {"from": "milk", "to": "grand manier", "value": 1, "width": 1}, {"from": "milk", "to": "butter", "value": 1, "width": 1}, {"from": "milk", "to": "cocoa", "value": 1, "width": 1}, {"from": "milk", "to": "water", "value": 1, "width": 1}, {"from": "milk", "to": "egg", "value": 1, "width": 1}, {"from": "milk", "to": "yogurt", "value": 1, "width": 1}, {"from": "milk", "to": "lemon", "value": 1, "width": 1}, {"from": "milk", "to": "gelatin", "value": 1, "width": 1}, {"from": "milk", "to": "fruits", "value": 1, "width": 1}, {"from": "black tea", "to": "honey", "value": 1, "width": 1}, {"from": "black tea", "to": "fresh cream", "value": 1, "width": 1}, {"from": "black tea", "to": "water", "value": 1, "width": 1}, {"from": "honey", "to": "fresh cream", "value": 1, "width": 1}, {"from": "honey", "to": "grand manier", "value": 1, "width": 1}, {"from": "honey", "to": "butter", "value": 1, "width": 1}, {"from": "honey", "to": "cocoa", "value": 1, "width": 1}, {"from": "honey", "to": "strong flour", "value": 1, "width": 1}, {"from": "honey", "to": "flour", "value": 1, "width": 1}, {"from": "honey", "to": "egg", "value": 1, "width": 1}, {"from": "honey", "to": "salad oil", "value": 1, "width": 1}, {"from": "honey", "to": "dry yeast", "value": 1, "width": 1}, {"from": "fresh cream", "to": "grand manier", "value": 1, "width": 1}, {"from": "fresh cream", "to": "butter", "value": 1, "width": 1}, {"from": "fresh cream", "to": "cocoa", "value": 1, "width": 1}, {"from": "fresh cream", "to": "water", "value": 1, "width": 1}, {"from": "fresh cream", "to": "egg", "value": 1, "width": 1}, {"from": "fresh cream", "to": "yogurt", "value": 1, "width": 1}, {"from": "fresh cream", "to": "lemon", "value": 1, "width": 1}, {"from": "fresh cream", "to": "gelatin", "value": 1, "width": 1}, {"from": "fresh cream", "to": "fruits", "value": 1, "width": 1}, {"from": "grand manier", "to": "butter", "value": 1, "width": 1}, {"from": "grand manier", "to": "cocoa", "value": 1, "width": 1}, {"from": "butter", "to": "cocoa", "value": 1, "width": 1}, {"from": "strong flour", "to": "flour", "value": 1, "width": 1}, {"from": "strong flour", "to": "egg", "value": 1, "width": 1}, {"from": "strong flour", "to": "salad oil", "value": 1, "width": 1}, {"from": "strong flour", "to": "dry yeast", "value": 1, "width": 1}, {"from": "flour", "to": "egg", "value": 1, "width": 1}, {"from": "flour", "to": "salad oil", "value": 1, "width": 1}, {"from": "flour", "to": "dry yeast", "value": 1, "width": 1}, {"from": "egg", "to": "salad oil", "value": 1, "width": 1}, {"from": "egg", "to": "dry yeast", "value": 1, "width": 1}, {"from": "egg", "to": "yogurt", "value": 1, "width": 1}, {"from": "egg", "to": "lemon", "value": 1, "width": 1}, {"from": "egg", "to": "gelatin", "value": 1, "width": 1}, {"from": "egg", "to": "fruits", "value": 1, "width": 1}, {"from": "salad oil", "to": "dry yeast", "value": 1, "width": 1}, {"from": "glutinous rice", "to": "red bean", "value": 1, "width": 1}, {"from": "glutinous rice", "to": "cloth", "value": 1, "width": 1}, {"from": "red bean", "to": "cloth", "value": 1, "width": 1}, {"from": "yogurt", "to": "lemon", "value": 1, "width": 1}, {"from": "yogurt", "to": "gelatin", "value": 1, "width": 1}, {"from": "yogurt", "to": "fruits", "value": 1, "width": 1}, {"from": "lemon", "to": "gelatin", "value": 1, "width": 1}, {"from": "lemon", "to": "fruits", "value": 1, "width": 1}, {"from": "gelatin", "to": "fruits", "value": 1, "width": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": true,
+        "filter": true
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+                  // if this network requires displaying the configure window,
+                  // put it in its div
+                  options.configure["container"] = document.getElementById("config");
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
