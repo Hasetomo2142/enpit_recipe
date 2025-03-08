@@ -1,9 +1,0 @@
-Warning: When  cdn_resources is 'local' jupyter notebook has issues displaying graphics on chrome/safari. Use cdn_resources='in_line' or cdn_resources='remote' if you have issues viewing graphics in a notebook.
-学習させたいレシピ数を整数を入力してください: Traceback (most recent call last):
-  File "main.py", line 7, in <module>
-    graph.load_recipes_from_cookpad()
-  File "/home/group1/app/creategraph.py", line 39, in load_recipes_from_cookpad
-    self.number_of_recipes = self.get_integer_from_command_line()
-  File "/home/group1/app/creategraph.py", line 128, in get_integer_from_command_line
-    number = int(input("学習させたいレシピ数を整数を入力してください: "))
-OSError: [Errno 9] Bad file descriptor
